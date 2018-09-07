@@ -36,10 +36,10 @@ Starts the Halyard engine in a Docker container. State is persisted in a named D
 Note that if you delete the named volume, your state will be lost on the next start of Halyard.
 
 .PARAMETER Version
-Version of Halyard to launch, corresponds to a Docker image tag. Defaults to "latest"
+Version of Halyard to launch, corresponds to a Docker image tag. Defaults to "stable".
 
 .PARAMETER Registry
-Name of the Docker registry to use.
+Name of the Docker registry to use. Defaults to "gcr.io/spinnaker-marketplace/halyard".
 
 .PARAMETER Pull
 Pulls the latest Docker image for the specified version. By default, only pulls if not already downloaded.
@@ -61,10 +61,10 @@ function Start-Halyard {
   [CmdletBinding(SupportsShouldProcess=$true, ConfirmImpact="Low")]
   Param(
     [string]
-    $Version = "latest",
+    $Version = "stable",
 
     [string]
-    $Registry = "centeredge/halyard",
+    $Registry = "gcr.io/spinnaker-marketplace/halyard",
 
     [switch]
     $Pull
@@ -84,9 +84,9 @@ function Start-Halyard {
 
   if ($PSCmdlet.ShouldProcess($ContainerName)) {
     $containerId = & docker run -d --rm --name $ContainerName `
-      -v "${HOME}/.kube:/home/halyard/.kube:ro" `
-      -v "halyard:/home/halyard/.hal" `
-      -v "$(GetBackupPath):/home/halyard/halbackups" `
+      -v "${HOME}/.kube:/home/spinnaker/.kube:ro" `
+      -v "halyard:/home/spinnaker/.hal" `
+      -v "$(GetBackupPath):/home/spinnaker/halbackups" `
       ${Registry}:$Version
 
     CheckExitCode
@@ -211,7 +211,7 @@ function Connect-Halyard {
 
   EnsureStarted
 
-  & docker exec -it -w /home/halyard/.hal $ContainerName $Command
+  & docker exec -it -w /home/spinnaker/.hal $ContainerName $Command
 
   CheckExitCode
 }
