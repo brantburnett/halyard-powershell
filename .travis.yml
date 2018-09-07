@@ -1,4 +1,6 @@
-language: generic
+language: csharp
+mono: none
+dotnet: 2.1.401
 
 addons:
   apt:
@@ -14,3 +16,9 @@ before_install:
 script:
   - pwsh -f ./scripts/test.ps1
   - pwsh -c "Invoke-ScriptAnalyzer ./SpinnakerHalyard/SpinnakerHalyard.psm1 -EnableExit"
+
+deploy:
+  provider: script
+  script: pwsh -c "./scripts/deploy.ps1 -Version $TRAVIS_TAG -NuGetApiKey $API_KEY"
+  on:
+    tags: true
