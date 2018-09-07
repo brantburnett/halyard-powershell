@@ -1,5 +1,7 @@
 # Spinnaker Halyard PowerShell Module
 
+[![Build Status](https://travis-ci.org/brantburnett/halyard-powershell.svg?branch=master)](https://travis-ci.org/brantburnett/halyard-powershell)
+
 The Spinnaker Halyard PowerShell eases the use of [Halyard](https://www.spinnaker.io/reference/halyard/) to manage and deploy [Spinnaker](https://www.spinnaker.io/) using Docker containers. This avoids the need to install Halyard on your local machine, and enables the use of Halyard from Windows. However, it is compatible with PowerShell Core on Linux.
 
 ## Prerequisites
