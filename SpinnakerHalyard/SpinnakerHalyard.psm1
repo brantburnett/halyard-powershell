@@ -58,7 +58,7 @@ Start-Halyard -Version 1.9.0
 #>
 function Start-Halyard {
   [OutputType([HalyardContainer])]
-  [CmdletBinding()]
+  [CmdletBinding(SupportsShouldProcess=$true, ConfirmImpact="Low")]
   Param(
     [string]
     $Version = "latest",
@@ -75,44 +75,41 @@ function Start-Halyard {
   }
 
   if ($Pull) {
-    & docker pull ${Registry}:$Version
-
-    CheckExitCode
+    Get-Halyard -Registry $Registry -Version $Version
   }
 
   if (-not ((docker volume ls -q) -contains "halyard")) {
-		Out-Host "Creating Halyard volume..."
-    & docker volume create halyard
-
-    CheckExitCode
+    New-DockerVolume -VolumeName "halyard"
 	}
 
-  $containerId = & docker run -d --rm --name $ContainerName `
-    -v "${HOME}/.kube:/home/halyard/.kube:ro" `
-    -v "halyard:/home/halyard/.hal" `
-    -v "$(GetBackupPath):/home/halyard/halbackups" `
-    ${Registry}:$Version
+  if ($PSCmdlet.ShouldProcess($ContainerName)) {
+    $containerId = & docker run -d --rm --name $ContainerName `
+      -v "${HOME}/.kube:/home/halyard/.kube:ro" `
+      -v "halyard:/home/halyard/.hal" `
+      -v "$(GetBackupPath):/home/halyard/halbackups" `
+      ${Registry}:$Version
 
-  CheckExitCode
+    CheckExitCode
 
-  # Wait for daemon to startup for 30 seconds
-  $count = 0
-  do {
-    Start-Sleep 1
+    # Wait for daemon to startup for 30 seconds
+    $count = 0
+    do {
+      Start-Sleep 1
 
-    & docker exec $ContainerName curl --connect-timeout 1 http://localhost:8064 2>&1 | Out-Null
+      & docker exec $ContainerName curl --connect-timeout 1 http://localhost:8064 2>&1 | Out-Null
 
-    if ($LASTEXITCODE -eq 0) {
-      break
-    }
+      if ($LASTEXITCODE -eq 0) {
+        break
+      }
 
-    $count++
-  } until ($count -eq 30)
+      $count++
+    } until ($count -eq 30)
 
-  $container = New-Object HalyardContainer
-  $container.Id = $containerId
-  $container.Name = $ContainerName
-  return $container
+    $container = New-Object HalyardContainer
+    $container.Id = $containerId
+    $container.Name = $ContainerName
+    return $container
+  }
 }
 
 <#
@@ -134,7 +131,10 @@ None.
 Stop-Halyard
 #>
 function Stop-Halyard {
-  if (Test-Halyard) {
+  [CmdletBinding(SupportsShouldProcess=$true, ConfirmImpact="Low")]
+  Param()
+
+  if ((Test-Halyard) -and $PSCmdlet.ShouldProcess($ContainerName)) {
     & docker stop $ContainerName | Out-Null
 
     CheckExitCode
@@ -241,7 +241,7 @@ function Backup-Halyard {
   try {
     $output = Invoke-Halyard -ErrorAction Stop backup create
   } finally {
-    Write-Host $output # Print the output that was captured
+    Write-Output $output # Print the output that was captured
   }
 
   # Find the output file, move this to the container folder which maps to the local .halbackups folder
@@ -323,6 +323,38 @@ function Restore-Halyard {
   }
 }
 
+function Get-Halyard {
+  [OutputType([HalyardContainer])]
+  [CmdletBinding(SupportsShouldProcess=$true, ConfirmImpact="Low")]
+  Param(
+    [string]
+    $Version = "latest",
+
+    [string]
+    $Registry = "centeredge/halyard"
+  )
+
+  if ($PSCmdlet.ShouldProcess("${Registry}:$Version")) {
+    & docker pull ${Registry}:$Version
+
+    CheckExitCode
+  }
+}
+
+function New-DockerVolume {
+  [OutputType([HalyardContainer])]
+  [CmdletBinding(SupportsShouldProcess=$true, ConfirmImpact="Low")]
+  Param(
+    [string] $VolumeName
+  )
+
+  if ($PSCmdlet.ShouldProcess($VolumeName)) {
+    & docker volume create $VolumeName
+
+    CheckExitCode
+  }
+}
+
 [string]
 function GetBackupPath {
   return "${HOME}/.halbackups"
@@ -330,7 +362,7 @@ function GetBackupPath {
 
 function EnsureStarted {
   if (-not (Test-Halyard)) {
-    Write-Host "Starting Halyard..."
+    Write-Information "Starting Halyard..."
     Start-Halyard | Out-Null
   }
 }
