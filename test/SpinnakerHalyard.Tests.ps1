@@ -1,5 +1,5 @@
-$ModuleManifestName = 'SpinnakerHalyard.psd1'
-$ModuleManifestPath = "$PSScriptRoot\..\$ModuleManifestName"
+$ModuleName = 'SpinnakerHalyard'
+$ModuleManifestPath = "$PSScriptRoot\..\$ModuleName\$ModuleName.psd1"
 
 Describe 'Module Manifest Tests' {
     It 'Passes Test-ModuleManifest' {
