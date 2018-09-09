@@ -87,8 +87,13 @@ function Start-Halyard {
       -v "${HOME}/.kube:/home/spinnaker/.kube:ro" `
       -v "halyard:/home/spinnaker/.hal" `
       -v "$(GetBackupPath):/home/spinnaker/halbackups" `
+      -v "${PSScriptRoot}:/home/spinnaker/scripts" `
       ${Registry}:$Version
 
+    CheckExitCode
+
+    # Ensure vim is installed for file editing during Connect-Halyard
+    & docker exec -u root:root $ContainerName /home/spinnaker/scripts/setup.sh
     CheckExitCode
 
     # Wait for daemon to startup for 30 seconds
@@ -131,7 +136,7 @@ None.
 Stop-Halyard
 #>
 function Stop-Halyard {
-  [CmdletBinding(SupportsShouldProcess=$true, ConfirmImpact="Low")]
+  [CmdletBinding(SupportsShouldProcess=$true, ConfirmImpact="Medium")]
   Param()
 
   if ((Test-Halyard) -and $PSCmdlet.ShouldProcess($ContainerName)) {
