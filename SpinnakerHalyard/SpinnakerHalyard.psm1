@@ -250,10 +250,10 @@ function Backup-Halyard {
   }
 
   # Find the output file, move this to the container folder which maps to the local .halbackups folder
-  $output | Where-Object { $_.StartsWith("/home/halyard/") } | ForEach-Object {
+  $output | Where-Object { $_.StartsWith("/home/spinnaker/") } | ForEach-Object {
     $containerPath = $_ -replace '\x1b\[\d+m', ''
 
-    Connect-Halyard mv $containerPath /home/halyard/halbackups
+    Connect-Halyard mv $containerPath /home/spinnaker/halbackups
 
     $localPath = Join-Path (GetBackupPath) ($containerPath -split '/' | Select-Object -Last 1)
     Get-Item $localPath
