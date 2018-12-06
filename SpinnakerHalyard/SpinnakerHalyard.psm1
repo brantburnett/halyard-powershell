@@ -87,6 +87,7 @@ function Start-Halyard {
       -v "${HOME}/.kube:/home/spinnaker/.kube:ro" `
       -v "halyard:/home/spinnaker/.hal" `
       -v "$(GetBackupPath):/home/spinnaker/halbackups" `
+      -v "${HOME}/.aws:/home/spinnaker/.aws" `
       -v "${PSScriptRoot}:/home/spinnaker/scripts" `
       ${Registry}:$Version
 
