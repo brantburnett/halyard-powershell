@@ -93,7 +93,7 @@ function Start-Halyard {
 
     CheckExitCode
 
-    # Ensure vim is installed for file editing during Connect-Halyard
+    # Perform setup which must run as the root user
     & docker exec -u root:root $ContainerName /home/spinnaker/scripts/setup.sh
     CheckExitCode
 
@@ -320,7 +320,7 @@ function Restore-Halyard {
       $Quiet = "-q"
     }
 
-    Invoke-Halyard backup restore --backup-path "/home/halyard/halbackups/$($relativePath.Replace("\", "/"))" $Quiet
+    Invoke-Halyard backup restore --backup-path "/home/spinnaker/halbackups/$($relativePath.Replace("\", "/"))" $Quiet
   }
   finally {
     if ($tempFile -ne "") {
