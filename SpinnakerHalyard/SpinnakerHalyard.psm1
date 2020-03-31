@@ -242,6 +242,7 @@ Backup-Halyard
 function Backup-Halyard {
   [CmdletBinding()]
   [OutputType([System.IO.FileInfo])]
+  [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSAvoidUsingPositionalParameters', '', Justification='Using ValueFromRemainingArguments')]
   Param()
 
   try {
@@ -286,6 +287,7 @@ Restore-Halyard ~\.halbackups\halbackup-Fri_Sep_07_14-13-34_UTC_2018.tar
 #>
 function Restore-Halyard {
   [CmdletBinding()]
+  [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSAvoidUsingPositionalParameters', '', Justification='Using ValueFromRemainingArguments')]
   Param(
     [string] $Path,
     [switch] $Force
