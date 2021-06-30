@@ -64,7 +64,7 @@ function Start-Halyard {
     $Version = "stable",
 
     [string]
-    $Registry = "gcr.io/spinnaker-marketplace/halyard",
+    $Registry = "us-docker.pkg.dev/spinnaker-community/docker/halyard",
 
     [switch]
     $Pull
