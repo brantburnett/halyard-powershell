@@ -1,1 +1,1 @@
-Invoke-Pester -Script (Join-Path $PSScriptRoot ..\test)
+Invoke-Pester -Script (Join-Path $PSScriptRoot ..\test) -EnableExit
